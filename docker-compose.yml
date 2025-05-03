@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  leave-service:
+    image: martial123/leave-service:latest
+    env_file:
+      - .env
+    ports:
+      - "8081:8081" # Change to your leave-service port
+    networks:
+      - backend
+
+  auth-service:
+    image: martial123/auth-service:latest
+    env_file:
+      - .env
+    ports:
+      - "8082:8082" # Change to your auth-service port
+    networks:
+      - backend
+
+  api-gateway:
+    image: martial123/api-gateway:latest
+    env_file:
+      - .env
+    ports:
+      - "8080:8080" # Change to your api-gateway port
+    networks:
+      - backend
+    depends_on:
+      - leave-service
+      - auth-service
+
+networks:
+  backend:
+    driver: bridge
