@@ -153,6 +153,4 @@ CLOUDINARY_API_SECRET=your_secret
 - All images are stored on Docker Hub for easy deployment.
 - The system is secured with SSL via Caddy and DNS is managed via AWS Route 53.
 - **Frontend is not included in this documentation.** # leave-management-system-bn
-# leave-management-system-bn
-# leave-management-system-bn
-# leave-management-system-bn
+
