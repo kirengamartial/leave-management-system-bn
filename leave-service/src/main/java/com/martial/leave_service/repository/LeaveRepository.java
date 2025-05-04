@@ -1,8 +1,9 @@
 package com.martial.leave_service.repository;
 
 import com.martial.leave_service.model.Leave;
+import com.martial.leave_service.model.LeaveStatus;
 import com.martial.leave_service.model.LeaveType;
-import com.martial.leave_service.model.User; // Add this import
+import com.martial.leave_service.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;
@@ -32,16 +33,6 @@ public interface LeaveRepository extends JpaRepository<Leave, String> {
                         "FROM leaves WHERE user_id = :userId AND leave_type = :leaveType", nativeQuery = true)
         double calculateLeaveBalance(@Param("userId") String userId, @Param("leaveType") String leaveType);
 
-        @Modifying
-        @Transactional
-        @Query("UPDATE Leave l SET l.balance = l.balance + :amount WHERE l.userId = :userId")
-        void addAccruedLeave(@Param("userId") String userId, @Param("amount") double amount);
-
-        @Modifying
-        @Transactional
-        @Query("UPDATE Leave l SET l.balance = LEAST(l.balance, :maxCarryOver) WHERE l.userId = :userId")
-        void processYearEndBalance(@Param("userId") String userId, @Param("maxCarryOver") double maxCarryOver);
-
         // Add the missing method
         @Query("SELECT l FROM Leave l WHERE " +
                         "(l.startDate BETWEEN :startDate AND :endDate) OR " +
@@ -51,4 +42,11 @@ public interface LeaveRepository extends JpaRepository<Leave, String> {
                         @Param("endDate") LocalDateTime endDate,
                         @Param("startDateTwo") LocalDateTime startDateTwo,
                         @Param("endDateTwo") LocalDateTime endDateTwo);
+
+        // Add these methods
+        List<Leave> findByLeaveTypeAndStatus(LeaveType leaveType, LeaveStatus status);
+
+        List<Leave> findByLeaveType(LeaveType leaveType);
+
+        List<Leave> findByStatus(LeaveStatus status);
 }

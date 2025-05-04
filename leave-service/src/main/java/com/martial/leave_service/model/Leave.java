@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "leaves")
@@ -15,6 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Leave {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,17 +29,17 @@ public class Leave {
 
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private int days;
     private String reason;
 
     @Enumerated(EnumType.STRING)
     private LeaveStatus status;
 
-    @ElementCollection
-    private List<String> supportingDocuments;
-    private String approverComment;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String comment;
 
-    // Add the missing balance field
-    private double balance;
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 }

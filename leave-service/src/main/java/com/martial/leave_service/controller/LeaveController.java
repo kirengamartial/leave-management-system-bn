@@ -2,6 +2,9 @@ package com.martial.leave_service.controller;
 
 import com.martial.leave_service.dto.LeaveRequest;
 import com.martial.leave_service.dto.LeaveResponse;
+import com.martial.leave_service.dto.LeaveStatusUpdateRequest;
+import com.martial.leave_service.model.LeaveStatus;
+import com.martial.leave_service.model.LeaveType;
 import com.martial.leave_service.service.LeaveService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -79,8 +82,10 @@ public class LeaveController {
     // Endpoints accessible by ADMIN only
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<LeaveResponse>> getAllLeaves() {
-        return ResponseEntity.ok(leaveService.getAllLeaves());
+    public ResponseEntity<List<LeaveResponse>> getAllLeaves(
+            @RequestParam(required = false) LeaveType leaveType,
+            @RequestParam(required = false) LeaveStatus status) {
+        return ResponseEntity.ok(leaveService.getAllLeaves(leaveType, status));
     }
 
     @GetMapping("/reports")
@@ -101,5 +106,25 @@ public class LeaveController {
     public ResponseEntity<String> uploadSupportingDocument(@RequestParam("file") MultipartFile file) {
         String fileUrl = leaveService.uploadSupportingDocument(file);
         return ResponseEntity.ok(fileUrl);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAnyRole('STAFF', 'MANAGER', 'ADMIN')")
+    public ResponseEntity<LeaveResponse> createLeave(@RequestBody LeaveRequest request) {
+        return ResponseEntity.ok(leaveService.createLeave(request));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('STAFF', 'MANAGER', 'ADMIN')")
+    public ResponseEntity<LeaveResponse> getLeaveById(@PathVariable String id) {
+        return ResponseEntity.ok(leaveService.getLeaveById(id));
+    }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    public ResponseEntity<LeaveResponse> updateLeaveStatus(
+            @PathVariable String id,
+            @RequestBody LeaveStatusUpdateRequest request) {
+        return ResponseEntity.ok(leaveService.updateLeaveStatus(id, request));
     }
 }
