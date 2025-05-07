@@ -37,6 +37,7 @@ public class LeaveServiceImpl implements LeaveService {
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.getUserByEmail(currentUserEmail);
         String currentUserId = user.getId();
+        double balance = 20;
 
         Leave leave = Leave.builder()
                 .userId(currentUserId)
@@ -46,6 +47,7 @@ public class LeaveServiceImpl implements LeaveService {
                 .days(calculateDays(request.getStartDate(), request.getEndDate()))
                 .reason(request.getReason())
                 .status(LeaveStatus.PENDING)
+                .balance(balance)
                 .build();
 
         Leave savedLeave = leaveRepository.save(leave);
@@ -123,6 +125,7 @@ public class LeaveServiceImpl implements LeaveService {
                 .reason(leave.getReason())
                 .status(leave.getStatus())
                 .comment(leave.getComment())
+                .balance(leave.getBalance()) // Include balance in response
                 .createdAt(leave.getCreatedAt())
                 .updatedAt(leave.getUpdatedAt())
                 .build();

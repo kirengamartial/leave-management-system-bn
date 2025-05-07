@@ -21,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -81,15 +83,18 @@ public class AuthServiceImpl implements AuthService {
             String profilePicture) {
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
+                    Set<Role> userRoles = new HashSet<>();
+                    userRoles.add(Role.STAFF);
+
                     User newUser = User.builder()
                             .email(email)
                             .firstName(firstName)
                             .lastName(lastName)
                             .googleId(googleId)
                             .profilePicture(profilePicture)
-                            .department("Not Set") // Default value for OAuth2 users
+                            .department("Not Set")
                             .isVerified(true)
-                            .roles(Collections.singleton(Role.STAFF))
+                            .roles(userRoles)
                             .build();
                     return userRepository.save(newUser);
                 });

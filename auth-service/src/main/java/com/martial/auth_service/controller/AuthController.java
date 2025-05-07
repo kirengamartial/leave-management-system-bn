@@ -70,7 +70,6 @@ public class AuthController {
         @GetMapping("/oauth2/redirect")
         public void oauth2Redirect(@RequestParam("code") String code, HttpServletResponse response)
                         throws java.io.IOException {
-                // 1. Exchange code for access token and user info from Google
                 String clientId = System.getenv("GOOGLE_CLIENT_ID");
                 String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET");
                 String googleRedirectUri = System.getenv("GOOGLE_REDIRECT_URI");
@@ -99,7 +98,10 @@ public class AuthController {
                                         .build();
                         java.net.http.HttpResponse<String> tokenResponse = httpClient.send(tokenRequest,
                                         java.net.http.HttpResponse.BodyHandlers.ofString());
+                        // Log token response status
+                        System.out.println("Token response status: " + tokenResponse.statusCode());
                         if (tokenResponse.statusCode() != 200) {
+                                System.out.println("Token response error: " + tokenResponse.body());
                                 response.sendRedirect(frontendUrl + "?error=Failed+to+get+access+token+from+Google");
                                 return;
                         }
@@ -114,6 +116,7 @@ public class AuthController {
                                         .build();
                         java.net.http.HttpResponse<String> userInfoResponse = httpClient.send(userInfoRequest,
                                         java.net.http.HttpResponse.BodyHandlers.ofString());
+
                         if (userInfoResponse.statusCode() != 200) {
                                 response.sendRedirect(frontendUrl + "?error=Failed+to+get+user+info+from+Google");
                                 return;
@@ -129,7 +132,6 @@ public class AuthController {
                         String profilePicture = userInfoJson.has("picture") ? userInfoJson.get("picture").asText()
                                         : null;
 
-                        // 2. Use your existing logic to handle OAuth2 login
                         String token = authService.handleOAuth2Login(email, firstName, lastName, googleId,
                                         profilePicture);
                         com.martial.auth_service.model.User user = authService.getUserByEmail(email);
@@ -147,7 +149,12 @@ public class AuthController {
                                                         .collect(Collectors.joining(",")));
                         response.sendRedirect(targetUrl.toString());
                 } catch (Exception e) {
-                        response.sendRedirect(frontendUrl + "?error=Google+OAuth+code+exchange+failed");
+                        // Log the specific exception
+                        System.out.println("OAuth error: " + e.getClass().getName() + ": " + e.getMessage());
+                        e.printStackTrace();
+                        response.sendRedirect(frontendUrl + "?error=Google+OAuth+code+exchange+failed&message=" +
+                                        java.net.URLEncoder.encode(e.getMessage(),
+                                                        java.nio.charset.StandardCharsets.UTF_8));
                 }
         }
 }

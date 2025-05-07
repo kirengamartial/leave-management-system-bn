@@ -37,6 +37,9 @@ public class Leave {
 
     private String comment;
 
+    // Add the balance field
+    private Double balance;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

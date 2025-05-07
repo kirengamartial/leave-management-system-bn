@@ -25,6 +25,7 @@ public class LeaveResponse {
     private String reason;
     private LeaveStatus status;
     private String comment;
+    private Double balance; // Add balance field
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
